@@ -1,3 +1,5 @@
+import flatpickr from 'flatpickr';
+
 export class TravelkingApp {
   constructor() {
     this.elements = {

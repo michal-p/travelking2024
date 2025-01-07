@@ -1,0 +1,23 @@
+{
+  "name": "travelking2024",
+  "version": "1.0.0",
+  "description": "This repository contains the implementation of the Travelking 2024 Front-End Developer Challenge. It showcases the availability and pricing of stays over a 6-month period using vanilla JavaScript and the Flatpickr library.",
+  "main": "script.js",
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Michal Puchy",
+  "license": "MIT",
+  "dependencies": {
+    "flatpickr": "^4.6.13"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "babel-loader": "^9.2.1",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  }
+}
