@@ -40,23 +40,12 @@ export class RoomManager {
       return;
     }
 
+    const pugTemplate = require('../templates/index.pug');
+    
     rooms._embedded.hotel_quotes.forEach((room) => {
       const roomDiv = document.createElement("div");
       roomDiv.classList.add("room");
-
-      const roomName = document.createElement("h3");
-      roomName.textContent = room.name || "Standard Room";
-
-      const roomDetails = document.createElement("p");
-      roomDetails.innerHTML = `
-        <strong>Price:</strong> ${room.full_formatted_price}<br>
-        <strong>Breakfast Included:</strong> ${room.breakfast ? "Yes" : "No"}<br>
-        <strong>Beds:</strong> ${room.beds || "N/A"}<br>
-        <strong>Max Occupancy:</strong> ${room.max_occupancy || "N/A"}
-      `;
-
-      roomDiv.appendChild(roomName);
-      roomDiv.appendChild(roomDetails);
+      roomDiv.innerHTML = pugTemplate(room);
       this.elements.roomInfo.appendChild(roomDiv);
     });
   }

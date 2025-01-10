@@ -47,6 +47,10 @@ module.exports = {
           'sass-loader'
         ],
       },
+      {
+        test: /\.pug$/,
+        use: ['@webdiscus/pug-loader'],
+      }
     ],
   },
   plugins: [

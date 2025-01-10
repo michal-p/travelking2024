@@ -1,0 +1,39 @@
+.room-card
+  .room-card__image
+    if _embedded && _embedded.pictures && _embedded.pictures[0]
+      img(src=_embedded.pictures[0].full, alt=description)
+    if _embedded && _embedded.pictures && _embedded.pictures.length > 1
+      .room-card__image-overlay + _embedded.pictures.length - 1
+  .room-card__content
+    .room-card__title
+      h2.room-card__title-heading= name
+      if description_long && description_long !== description
+        span.room-card__title-subheading= description_long
+    .room-card__details
+      if room_size_min
+        .room-card__details-item
+          span.room-card__details-icon= room_size_min + (room_size_max ? '-' + room_size_max : '') + ' m²'
+      if _embedded && _embedded.amenities
+        each amenity in _embedded.amenities
+          if amenity.name === 'double-bed'
+            .room-card__details-item
+              span.room-card__details-icon= amenity.description
+          if amenity.name === 'desk'
+            .room-card__details-item
+              span.room-card__details-icon= amenity.description
+          if amenity.name === 'tv'
+            .room-card__details-item
+              span.room-card__details-icon= amenity.description
+          if amenity.name === 'chairs'
+            .room-card__details-item
+              span.room-card__details-icon= amenity.description
+    .room-card__availability
+        span.room-card__availability-text 3 or more rooms are available for these dates
+    .room-card__price
+      span.room-card__price-amount= full_formatted_price
+  if _embedded && _embedded.addons && _embedded.addons.length > 0
+    .room-card__included
+      h3.room-card__included-title Inklusiveleistungen:
+      ul.room-card__included-list
+        each addon in _embedded.addons
+          li.room-card__included-item= addon.description
