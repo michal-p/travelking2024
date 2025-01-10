@@ -1,4 +1,5 @@
 import flatpickr from 'flatpickr';
+import { format } from 'date-fns';
 
 export class TravelkingApp {
   constructor() {
@@ -8,22 +9,21 @@ export class TravelkingApp {
       loading: document.getElementById("loading"),
       errorMessage: document.getElementById("errorMessage"),
     };
-    this.availabilityData = [];
     this.flatpickrInstance = null;
     this.initializeCalendar();
   }
 
-  async initializeCalendar() {
+  initializeCalendar = async () => {
     try {
       const data = await this.fetchAvailability();
-      this.availabilityData = data;
-      this.setupFlatpickr();
+      this.setupFlatpickr(data);
     } catch (error) {
       this.showError("Failed to fetch availability data.");
       console.error(error);
     }
   }
 
+  // This methods about loading and error should be in a separate class
   showLoading() {
     this.elements.loading.style.visibility = "visible";
   }
@@ -36,14 +36,14 @@ export class TravelkingApp {
     this.elements.errorMessage.textContent = message;
   }
 
-  async fetchAvailability() {
+  fetchAvailability = async () => {
     this.showLoading();
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + 6);
     const startDate = new Date();
 
-    const formattedStart = startDate.toISOString().split("T")[0];
-    const formattedEnd = endDate.toISOString().split("T")[0];
+    const formattedStart = format(startDate, 'yyyy-MM-dd');
+    const formattedEnd = format(endDate, 'yyyy-MM-dd');
 
     const apiURL = `https://api.travelcircus.net/hotels/17080/checkins?party=%7B%22adults%22:2,%22children%22:%5B%5D%7D&domain=de&date_start=${formattedStart}&date_end=${formattedEnd}`;
 
@@ -61,34 +61,41 @@ export class TravelkingApp {
     }
   }
 
-  setupFlatpickr() {
-    const availableDates = this.availabilityData._embedded.hotel_availabilities.map(
-      (item) => item.date
+  decorateDayElement = (dayElem, data) => {
+    const date = format(dayElem.dateObj, 'yyyy-MM-dd');
+    const dayData = data._embedded.hotel_availabilities.find(
+      (item) => item.date === format(date, 'yyyy-MM-dd')
     );
+    if (dayData) {
+      dayElem.setAttribute(
+        "title",
+        `Price: ${dayData.price}€\nMin Nights: ${dayData.min_nights}`
+      );
+      this.setDayElementStyle(dayElem, dayData.price_position);
+    }
+  }
+
+  setDayElementStyle = (dayElem, pricePosition) => {
+    if (pricePosition === "low") {
+      dayElem.style.backgroundColor = "#d4edda"; // light green
+    } else if (pricePosition === "medium") {
+      dayElem.style.backgroundColor = "#fff3cd";
+    } else if (pricePosition === "high") {
+      dayElem.style.backgroundColor = "#f8d7da"; // light red
+    }
+  }
+
+  setupFlatpickr = (data) => {
     this.flatpickrInstance = flatpickr(this.elements.checkAvailabilityBtn, {
       mode: "range",
       dateFormat: "Y-m-d",
       minDate: "today",
       maxDate: new Date().fp_incr(180),
-      enable: availableDates,
+      enable: data._embedded.hotel_availabilities.map(
+        (item) => item.date
+      ),
       onDayCreate: (dObj, dStr, fp, dayElem) => {
-        const date = dayElem.dateObj.toISOString().split("T")[0];
-        const dayData = this.availabilityData._embedded.hotel_availabilities.find(
-          (item) => item.date === date
-        );
-        if (dayData) {
-          dayElem.setAttribute(
-            "title",
-            `Price: ${dayData.price}€\nMin Nights: ${dayData.min_nights}`
-          );
-          if (dayData.price_position === "low") {
-            dayElem.style.backgroundColor = "#d4edda";
-          } else if (dayData.price_position === "medium") {
-            dayElem.style.backgroundColor = "#fff3cd";
-          } else if (dayData.price_position === "high") {
-            dayElem.style.backgroundColor = "#f8d7da";
-          }
-        }
+        this.decorateDayElement(dayElem, data);
       },
       onClose: (selectedDates) => {
         if (selectedDates.length === 2) {
@@ -101,14 +108,15 @@ export class TravelkingApp {
     });
   }
 
+  // From here it belongs to different class to get and display room data
   confirmSelection() {
     const selectedRange = this.flatpickrInstance.selectedDates;
     if (selectedRange.length !== 2) {
       this.showError("Please select a check-in and check-out date.");
       return;
     }
-    const checkIn = selectedRange[0].toISOString().split("T")[0];
-    const checkOut = selectedRange[1].toISOString().split("T")[0];
+    const checkIn = format(selectedRange[0], 'yyyy-MM-dd');
+    const checkOut = format(selectedRange[1], 'yyyy-MM-dd');
     this.fetchRoomData(checkIn, checkOut);
   }
 

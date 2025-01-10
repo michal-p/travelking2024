@@ -9,7 +9,9 @@ module.exports = {
     clean: true, // Clean the output directory before building
   },
   devServer: {
-    static: path.join(__dirname), // Path to static files
+    static: {
+      directory: path.join(__dirname, 'dist'), // Path to static files
+    },
     compress: true, // Enable gzip compression
     port: 9000,
     hot: true, // Hot Module Replacement

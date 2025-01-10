@@ -12,6 +12,7 @@
   "author": "Michal Puchy",
   "license": "MIT",
   "dependencies": {
+    "date-fns": "^4.1.0",
     "flatpickr": "^4.6.13"
   },
   "devDependencies": {
