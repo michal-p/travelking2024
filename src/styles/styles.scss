@@ -60,23 +60,6 @@ body {
   padding: 15px;
   border-radius: 5px;
   margin-bottom: 10px;
-
-  &__title {
-    margin-bottom: 10px;
-    color: #007bff;
-  }
-
-  &__price {
-    &--low {
-      color: green;
-    }
-    &--medium {
-      color: orange;
-    }
-    &--high {
-      color: red;
-    }
-  }
 }
 
 /* Loading Spinner */
@@ -114,14 +97,23 @@ body {
 
 /* Price Position Colors */
 .low-price {
+  &.flatpickr-day.prevMonthDay{
+    background-color: green;
+  }
   background-color: green;
 }
 
 .medium-price {
+  &.flatpickr-day.prevMonthDay{
+    background-color: orange;
+  }
   background-color: orange;
 }
 
 .high-price {
+  &.flatpickr-day.prevMonthDay{
+    background-color: red;
+  }
   background-color: red;
 }
 
