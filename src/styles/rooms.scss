@@ -1,0 +1,113 @@
+.room-card {
+  display: flex;
+  flex-direction: row;
+  margin-left: auto;
+  margin-right: auto;
+
+  &__image {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 10px;
+    padding-right: 20px;
+    img {
+      width: 100%;
+      display: block;
+    }
+    &-overlay {
+      position: absolute;
+      bottom: 10px;
+      right: 30px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+  }
+
+  &__content {
+    margin-bottom: 10px;
+    margin-right: 10px;
+  }
+
+  &__title {
+    margin-bottom: 10px;
+    &-heading {
+      font-size: 1.2em;
+      margin-bottom: 5px;
+    }
+    &-subheading {
+      font-size: 0.9em;
+      color: #777;
+    }
+  }
+
+  &__details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    &-item {
+      display: flex;
+      align-items: center;
+      width: calc(50% - 5px);
+      @media (max-width: 400px) {
+        width: 100%;
+      }
+    }
+  }
+
+    &__availability{
+        margin-bottom: 10px;
+        color: green;
+    }
+
+  &__price {
+    margin-bottom: 10px;
+    &-amount {
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+    &-unit {
+      font-size: 0.8em;
+      color: #777;
+    }
+  }
+
+  &__included {
+    &-title {
+      font-size: 1em;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    &-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      li {
+        margin-bottom: 3px;
+        &::before {
+          content: "✓ ";
+          color: green;
+        }
+      }
+    }
+  }
+
+  // Responsivity
+  @media (max-width: 768px) { 
+    flex-direction: column;
+    .room-card__details {
+        flex-direction: row;
+    }
+
+  }
+
+  @media (max-width: 480px) {
+    .room-card__title-heading {
+      font-size: 1em;
+    }
+    .room-card__price-amount {
+      font-size: 1em;
+    }
+  }
+}

@@ -87,14 +87,15 @@ export class CalendarManager {
   }
 
   setDayElementStyle = (dayElem, pricePosition) => {
+    dayElem.classList.remove("low-price", "medium-price", "high-price");
     if (pricePosition === "low") {
-      dayElem.style.backgroundColor = "#d4edda"; // light green
+        dayElem.classList.add("low-price");
     } else if (pricePosition === "medium") {
-      dayElem.style.backgroundColor = "#fff3cd";
+        dayElem.classList.add("medium-price");
     } else if (pricePosition === "high") {
-      dayElem.style.backgroundColor = "#f8d7da"; // light red
+        dayElem.classList.add("high-price");
     }
-  }
+}
 
   confirmSelection = () => {
     try {

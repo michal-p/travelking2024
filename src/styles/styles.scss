@@ -1,0 +1,130 @@
+@use './variables' as *;
+@use './rooms.scss' as *;
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: $primary-color;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Basic Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Button Styling */
+.button {
+  padding: 15px 25px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &--check-availability {
+    background-color: #007bff;
+    color: white;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+}
+
+/* Calendar Container */
+.calendar {
+  height: 100%;
+
+  &__container {
+    height: fit-content;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Room Information */
+.room {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+
+  &__title {
+    margin-bottom: 10px;
+    color: #007bff;
+  }
+
+  &__price {
+    &--low {
+      color: green;
+    }
+    &--medium {
+      color: orange;
+    }
+    &--high {
+      color: red;
+    }
+  }
+}
+
+/* Loading Spinner */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #09f;
+  animation: spin 1s ease infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error Message */
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Visibility Classes */
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+/* Price Position Colors */
+.low-price {
+  background-color: green;
+}
+
+.medium-price {
+  background-color: orange;
+}
+
+.high-price {
+  background-color: red;
+}
+
+.footer {
+  color: $travelking-color;
+}
