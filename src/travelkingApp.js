@@ -1,5 +1,8 @@
-import flatpickr from 'flatpickr';
-import { format } from 'date-fns';
+import { CalendarManager } from './components/calendarManager.js';
+import { RoomManager } from './components/roomManager.js';
+
+const AVAILABILITIES_API_URL = "https://api.travelcircus.net/hotels/17080/quotes?locale=de&party=%7B%22adults%22:2,%22children%22:%5B%5D%7D&domain=de";
+const CHECKINS_API_URL = "https://api.travelcircus.net/hotels/17080/checkins?party=%7B%22adults%22:2,%22children%22:%5B%5D%7D&domain=de";
 
 export class TravelkingApp {
   constructor() {
@@ -9,164 +12,14 @@ export class TravelkingApp {
       loading: document.getElementById("loading"),
       errorMessage: document.getElementById("errorMessage"),
     };
-    this.flatpickrInstance = null;
-    this.initializeCalendar();
+    this.init();
   }
 
-  initializeCalendar = async () => {
-    try {
-      const data = await this.fetchAvailability();
-      this.setupFlatpickr(data);
-    } catch (error) {
-      this.showError("Failed to fetch availability data.");
-      console.error(error);
-    }
+  init = () => {
+    this.calendarManager = new CalendarManager(this.elements, CHECKINS_API_URL, this.runRoomManager);
   }
 
-  // This methods about loading and error should be in a separate class
-  showLoading() {
-    this.elements.loading.style.visibility = "visible";
-  }
-
-  hideLoading() {
-    this.elements.loading.style.visibility = "hidden";
-  }
-
-  showError(message) {
-    this.elements.errorMessage.textContent = message;
-  }
-
-  fetchAvailability = async () => {
-    this.showLoading();
-    const endDate = new Date();
-    endDate.setMonth(endDate.getMonth() + 6);
-    const startDate = new Date();
-
-    const formattedStart = format(startDate, 'yyyy-MM-dd');
-    const formattedEnd = format(endDate, 'yyyy-MM-dd');
-
-    const apiURL = `https://api.travelcircus.net/hotels/17080/checkins?party=%7B%22adults%22:2,%22children%22:%5B%5D%7D&domain=de&date_start=${formattedStart}&date_end=${formattedEnd}`;
-
-    try {
-      const response = await fetch(apiURL);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      this.hideLoading();
-      return data;
-    } catch (error) {
-      this.hideLoading();
-      throw error;
-    }
-  }
-
-  decorateDayElement = (dayElem, data) => {
-    const date = format(dayElem.dateObj, 'yyyy-MM-dd');
-    const dayData = data._embedded.hotel_availabilities.find(
-      (item) => item.date === format(date, 'yyyy-MM-dd')
-    );
-    if (dayData) {
-      dayElem.setAttribute(
-        "title",
-        `Price: ${dayData.price}€\nMin Nights: ${dayData.min_nights}`
-      );
-      this.setDayElementStyle(dayElem, dayData.price_position);
-    }
-  }
-
-  setDayElementStyle = (dayElem, pricePosition) => {
-    if (pricePosition === "low") {
-      dayElem.style.backgroundColor = "#d4edda"; // light green
-    } else if (pricePosition === "medium") {
-      dayElem.style.backgroundColor = "#fff3cd";
-    } else if (pricePosition === "high") {
-      dayElem.style.backgroundColor = "#f8d7da"; // light red
-    }
-  }
-
-  setupFlatpickr = (data) => {
-    this.flatpickrInstance = flatpickr(this.elements.checkAvailabilityBtn, {
-      mode: "range",
-      dateFormat: "Y-m-d",
-      minDate: "today",
-      maxDate: new Date().fp_incr(180),
-      enable: data._embedded.hotel_availabilities.map(
-        (item) => item.date
-      ),
-      onDayCreate: (dObj, dStr, fp, dayElem) => {
-        this.decorateDayElement(dayElem, data);
-      },
-      onClose: (selectedDates) => {
-        if (selectedDates.length === 2) {
-          this.elements.checkAvailabilityBtn.textContent = this.elements.checkAvailabilityBtn.value;
-          this.confirmSelection();
-        } else {
-          this.elements.checkAvailabilityBtn.textContent = "Check Availability";
-        }
-      },
-    });
-  }
-
-  // From here it belongs to different class to get and display room data
-  confirmSelection() {
-    const selectedRange = this.flatpickrInstance.selectedDates;
-    if (selectedRange.length !== 2) {
-      this.showError("Please select a check-in and check-out date.");
-      return;
-    }
-    const checkIn = format(selectedRange[0], 'yyyy-MM-dd');
-    const checkOut = format(selectedRange[1], 'yyyy-MM-dd');
-    this.fetchRoomData(checkIn, checkOut);
-  }
-
-  async fetchRoomData(checkIn, checkOut) {
-    this.showLoading();
-    this.elements.errorMessage.textContent = "";
-    this.elements.roomInfo.innerHTML = "";
-    const apiURL = `https://api.travelcircus.net/hotels/17080/quotes?locale=de&checkin=${checkIn}&checkout=${checkOut}&party=%7B%22adults%22:2,%22children%22:%5B%5D%7D&domain=de`;
-
-    try {
-      const response = await fetch(apiURL);
-      const data = await response.json();
-      if (!response.ok) {
-        const errorData = data;
-        throw new Error(errorData.error.message);
-      }
-      const rooms = data;
-      this.hideLoading();
-      this.displayRooms(rooms);
-    } catch (error) {
-      this.hideLoading();
-      this.showError(error.message || "Failed to fetch room data.");
-      console.error(error);
-    }
-  }
-
-  displayRooms(rooms) {
-    if (rooms.length === 0) {
-      this.showError("No rooms available for the selected dates.");
-      return;
-    }
-
-    rooms._embedded.hotel_quotes.forEach((room) => {
-      const roomDiv = document.createElement("div");
-      roomDiv.classList.add("room");
-
-      const roomName = document.createElement("h3");
-      roomName.textContent = room.name || "Standard Room";
-
-      const roomDetails = document.createElement("p");
-      roomDetails.innerHTML = `
-        <strong>Price:</strong> ${room.full_formatted_price}<br>
-        <strong>Breakfast Included:</strong> ${room.breakfast ? "Yes" : "No"}<br>
-        <strong>Beds:</strong> ${room.beds || "N/A"}<br>
-        <strong>Max Occupancy:</strong> ${room.max_occupancy || "N/A"}
-      `;
-
-      roomDiv.appendChild(roomName);
-      roomDiv.appendChild(roomDetails);
-      this.elements.roomInfo.appendChild(roomDiv);
-    });
+  runRoomManager = ({ checkIn, checkOut}) => {
+    this.roomManager = new RoomManager(this.elements, AVAILABILITIES_API_URL, checkIn, checkOut);
   }
 }
