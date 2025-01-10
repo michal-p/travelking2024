@@ -128,15 +128,17 @@ export class TravelkingApp {
 
     try {
       const response = await fetch(apiURL);
+      const data = await response.json();
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const errorData = data;
+        throw new Error(errorData.error.message);
       }
-      const rooms = await response.json();
+      const rooms = data;
       this.hideLoading();
       this.displayRooms(rooms);
     } catch (error) {
       this.hideLoading();
-      this.showError("Failed to fetch room data.");
+      this.showError(error.message || "Failed to fetch room data.");
       console.error(error);
     }
   }
