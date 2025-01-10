@@ -1,0 +1,15 @@
+$primary-color: #cccad9;
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: $primary-color;
+  color: black;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}
